@@ -30,7 +30,7 @@ class Agent(object):
         """
         Perception of the environment
         """
-        # Perçoit l'environnement proche
+        # Perceives the surrounding environment
         self.littleGrid = env.getGrid(self.position)
 
     def action(self):
