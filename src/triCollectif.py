@@ -1,8 +1,6 @@
 import environnement as e
 
 
-
-
 def main():
     env = e.Environnement(50,50,200,200,20)
     env.dropObjects()

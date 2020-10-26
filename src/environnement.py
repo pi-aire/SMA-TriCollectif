@@ -4,18 +4,18 @@ class Environnement(object):
     """
     docstring
     """
-    def __init__(self,N,M,na,nb,nagent):
+    def __init__(self,N,M,na,nb,nAgent):
         self.grid = [[ 0 for j in range(M)] for i in range(N)]
         self.na  = na
         self.nb  = nb
-        self.nagent  = nagent
+        self.nAgent  = nAgent
         self.N = N 
         self.M = M
         self.agentPosition = dict()
 
     def dropObjects(self):
         """
-        Dépose les A , les B
+        Drops the A , the B
         """
         naDroped = 0
         while(naDroped != self.na):
@@ -24,21 +24,21 @@ class Environnement(object):
             if self.grid[x][y] == 0:
                 self.grid[x][y] = "A"
                 naDroped +=1
-        nbDroped = 0
-        while(nbDroped != self.nb):
+        nbDropped = 0
+        while(nbDropped != self.nb):
             x = random.randint(0,self.N-1)
             y = random.randint(0,self.M-1)
             if self.grid[x][y] == 0:
                 self.grid[x][y] = "B"
-                nbDroped +=1
+                nbDropped +=1
 
     def dropAgents(self,ids):
-        """Place les agents dans l'environnement
-        seulement sur les cases 0 disponible
+        """
+        Places agents in the environment only on the available 0 boxes
         """
         agentPosition = []
         naDroped = 0
-        while(naDroped != self.nagent):
+        while(naDroped != self.nAgent):
             x = random.randint(0,self.N-1)
             y = random.randint(0,self.M-1)
             if self.grid[x][y] == 0:
@@ -49,14 +49,14 @@ class Environnement(object):
 
     def getSensoredData(self,id,distance):
         """
-        Fournis les données du capteurs de l'environement 
+        Provides environmental sensor data
         Args:
-            id (str): id de l'agent que l'on souhaite percevoir
-            distance (int): distance de vision de l'agent
+            id (str): id of the agent you wish to perceive
+            distance (int): distance of vision of the agent
         Returns:
-            [list<list>]: liste de liste de chaque direction de distance de la vision
+            [list<list>]: list of list of each direction of distance of vision
         """
-        # perception torique ou impossible
+        # toric perception impossible
         
 
         
