@@ -37,49 +37,34 @@ class Agent(object):
         """
         Manages the management of actions in the environment
         """
-        # Filling the memory queue
-        if littleGrid[0][1] == "A":
-            memory.append("A")
-        if littleGrid[0][1] == "B":
-            memory.append("B")
-        if littleGrid[0][1] == "0":
-            memory.append("0")
-        if littleGrid[0][-1] == "A":
-            memory.append("A")
-        if littleGrid[0][-1] == "B":
-            memory.append("B")
-        if littleGrid[0][-1] == "0":
-            memory.append("0")
-        if littleGrid[1][0] == "A":
-            memory.append("A")
-        if littleGrid[1][0] == "B":
-            memory.append("B")
-        if littleGrid[1][0] == "0":
-            memory.append("0")
-        if littleGrid[-1][0] == "A":
-            memory.append("A")
-        if littleGrid[-1][0] == "B":
-            memory.append("B")
-        if littleGrid[-1][0] == "0":
-            memory.append("0")
+        # Filling the memory queue. We look if it isn't a wall
+        lookAt = random.randint(1,4)
+        if lookAt == 1 and self.littleGrid[0][self.i+1] != "W":
+            memory.append(self.littleGrid[0][self.i+1])
+        if lookAt == 2 and self.littleGrid[0][self.i-1] != "W":
+            memory.append(self.littleGrid[0][self.i-1])
+        if lookAt == 3 and self.littleGrid[self.i+1][0] != "W":
+            memory.append(self.littleGrid[self.i+1][0])
+        if lookAt == 4 and self.littleGrid[self.i-1][0] != "W":
+            memory.append(self.littleGrid[self.i-1][0])
+
         # Calculation of the memory size
         actualSize = len(memory)
         # Removal of excess items
         for i in range (actualSize - self.memorySize):
             memory.pop(0)
 
-    def move(self):
+    def move(self, move):
         """
         Manages the agent's movements. We must check if the "teleportation" box is not a wall.
         """
-        move = random.randint(1,4)
-        if move == 1 and self.littleGrid[0][self.i+1] != "M":
+        if move == 1 and self.littleGrid[0][self.i+1] != "W":
             self.position[0] += self.i
-        if move == 2 and self.littleGrid[0][self.i-1] != "M":
+        if move == 2 and self.littleGrid[0][self.i-1] != "W":
             self.position[0] -= self.i
-        if move == 3 and self.littleGrid[self.i+1][0] != "M":
+        if move == 3 and self.littleGrid[self.i+1][0] != "W":
             self.position[1] += self.i
-        if move ==4 and self.littleGrid[self.i-1][0] != "M":
+        if move ==4 and self.littleGrid[self.i-1][0] != "W":
             self.position[1] -= self.i
 
     def take(self):
