@@ -1,11 +1,13 @@
 import random
+import math
+from environnement import *
 
 class Agent(object):
     """
     Sorting agent class
     """
 
-    def __init(self, position, loaded, kp, km, i, f, memory, memorySize, littleGrid):
+    def __init(self, env:Environnement, id, position, kp, km, i, memorySize):
         """
         Position position is a table position[0] = x et [1] = y
         Loaded is a char : 0 empty, A if object A et B if object B
@@ -13,68 +15,63 @@ class Agent(object):
         km : k-
         i : The number of movement boxes
         f : The proportion of objects of the same type A or B in the immediate environment
-        memory : file des objets déjà croisé 
         littleGrid : queue of already crossed objects 
         """
-        self.position = position
-        self.loaded = loaded
+        self.env = env
+        self.id = id
+        self.position = position # temporaire
+        self.loaded = ""
         self.kp = kp
         self.km = km
         self.i = i
-        self.f = f
-        self.memory = memory
-        self.littleGrid = littleGrid
+        self.memory = []
+        self.neighborhood
         self.memorySize = memorySize
 
-    def perception(self, env):
+    def perception(self):
         """
         Perception of the environment
         """
         # Perceives the surrounding environment
-        self.littleGrid = env.getGrid(self.position)
+        self.neighborhood, self.self = self.env.getNeighborhood(self.id, self.i)
 
     def action(self):
         """
         Manages the management of actions in the environment
         """
         # Filling the memory queue. We look if it isn't a wall
-        lookAt = random.randint(1,4)
-        if lookAt == 1 and self.littleGrid[0][self.i+1] != "W":
-            memory.append(self.littleGrid[0][self.i+1])
-        if lookAt == 2 and self.littleGrid[0][self.i-1] != "W":
-            memory.append(self.littleGrid[0][self.i-1])
-        if lookAt == 3 and self.littleGrid[self.i+1][0] != "W":
-            memory.append(self.littleGrid[self.i+1][0])
-        if lookAt == 4 and self.littleGrid[self.i-1][0] != "W":
-            memory.append(self.littleGrid[self.i-1][0])
+        while True:
+            lookAt = random.randint(0,3)
+            if len(self.neighborhood[lookAt]) != 0:
+                self.move(CP(lookAt))
+                # it is on the new point
+                
+                if self.neighborhood[lookAt][self.i-1] == "0" and self.loaded != "":
+                    self.drop()
+                elif self.neighborhood[lookAt][self.i-1] != "0" and self.loaded == "":
+                    self.take(self.neighborhood[lookAt][self.i-1])
+                    
+                # self.memory.append(self.neighborhood[lookAt][self.i-1])
+                break
+        # sliding window
+        if len(self.memory) == self.memorySize:
+            self.memory.pop(0)
 
-        # Calculation of the memory size
-        actualSize = len(memory)
-        # Removal of excess items
-        for i in range (actualSize - self.memorySize):
-            memory.pop(0)
-
-    def move(self, move):
+    def move(self, oriantation:CP):
         """
         Manages the agent's movements. We must check if the "teleportation" box is not a wall.
         """
-        if move == 1 and self.littleGrid[0][self.i+1] != "W":
-            self.position[0] += self.i
-        if move == 2 and self.littleGrid[0][self.i-1] != "W":
-            self.position[0] -= self.i
-        if move == 3 and self.littleGrid[self.i+1][0] != "W":
-            self.position[1] += self.i
-        if move ==4 and self.littleGrid[self.i-1][0] != "W":
-            self.position[1] -= self.i
+        self.env.newPosition(self.id,oriantation,self.i)
 
-    def take(self):
+    def take(self,object:str):
         """
         Manages the taking of an object
-        """
-        pPrise = (self.kp / (self.kp + self.f))*(self.kp / (self.kp + self.f))
-        bool = takeOrDrop(pPrise)
-        if bool:
-            pass
+        """ 
+        f = self.proportionCalculation(object)
+        pTake = math.pow(self.kp / (self.kp + f), 2)
+        if self.doI(pTake):
+            self.loaded = object
+            
             #TODO 
             #Voir comment on prend un objet. As-ton besoin de la lettre ? 
 
@@ -82,46 +79,28 @@ class Agent(object):
         """
         Manages the drop of an object
         """
-        pDepot = (self.f / (self.km + self.f))* (self.f / (self.km + self.f))
-        bool = takeOrDrop(pDepot)
-        if bool:
-            self.loaded = 0
+        f = self.proportionCalculation(self.loaded)
+        pDrop = math.pow(f / (self.km + f), 2) 
+        if self.doI(pDrop):
+            self.loaded = ""
             # TODO
             # Prévenir l'environnement qu'on a plus l'objet
 
-    def proportionCalculation(self):
+    def proportionCalculation(self,object):
         """
         Calculation of the proportion of objects 
         """
         nbObj = 0
-        if self.loaded == 0:
-            self.f = 0
-        elif self.loaded == 'A':
-            if  self.littleGrid[self.position[0]-1][self.postion[1]] == 'A':
+        for i in range(4):
+            if self.neighborhood[i][self.i-1] == object:
                 nbObj += 1
-            if  self.littleGrid[self.position[0]+1][self.postion[1]] == 'A':
-                nbObj += 1
-            if  self.littleGrid[self.position[0]][self.postion[1]-1] == 'A':
-                nbObj += 1
-            if  self.littleGrid[self.position[0]][self.postion[1]+1] == 'A':
-                nbObj += 1
-            self.f = nbObj / 4
-        elif self.loaded == 'B':
-            if  self.littleGrid[self.position[0]-1][self.postion[1]] == 'B':
-                nbObj += 1
-            if  self.littleGrid[self.position[0]+1][self.postion[1]] == 'B':
-                nbObj += 1
-            if  self.littleGrid[self.position[0]][self.postion[1]-1] == 'B':
-                nbObj += 1
-            if  self.littleGrid[self.position[0]][self.postion[1]+1] == 'B':
-                nbObj += 1
-            self.f = nbObj / 4
+        return nbObj / 4
 
-    def takeOrDrop(self, probability):
+    def doI(self, probability):
         """
         Determines if the object is taken/dropped or not.
         """
         random = random.randfloat(0,100)
-        if random <= probability:
+        if random <= probability*100:
             return True
         return False
