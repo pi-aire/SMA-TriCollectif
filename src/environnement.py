@@ -3,10 +3,10 @@ import enum
 
 class CP(enum.Enum):
     """ Cardinal Points """
-    NORTH=0
-    EAST=1
-    SOUTH=2
-    WEST=3
+    NORTH = 0
+    EAST = 1
+    SOUTH = 2
+    WEST = 3
 
 class Environnement(object):
     """
@@ -77,9 +77,9 @@ class Environnement(object):
                         nbh.append(self.grid[ap["x"]][ap["y"]+oriantation[1]:boundy+oriantation[1]])
                 else:
                     if boundx < ap["x"]:
-                        nbh.append(self.grid[boundx:ap["x"]][ap["y"]])
+                        nbh.append([ line[ap["y"]] for line in self.grid[boundx:ap["x"]] ])
                     else:
-                        nbh.append(self.grid[ap["x"]+oriantation[0]:boundx+oriantation[0]][ap["y"]])    
+                        nbh.append([ line[ap["y"]] for line in self.grid[ap["x"] + oriantation[0]:boundx + oriantation[0]] ])
             else:
                 nbh.append([])
         underAgent = "0"
@@ -97,8 +97,8 @@ class Environnement(object):
         """
         orientations = [(0,-1),(1,0),(0,1),(-1,0)]
         ap = self.agentsPosition[id] #Position de l'agent
-        newx = ap["x"] + (orientations[orentation][0] * range)
-        newy = ap["y"] + (orientations[orentation][1] * range)
+        newx = ap["x"] + (orientations[orentation.value][0] * range)
+        newy = ap["y"] + (orientations[orentation.value][1] * range)
         # clean the previous position
         if len(self.grid[ap["x"]][ap["y"]]) == 2:
             self.grid[ap["x"]][ap["y"]] = self.grid[ap["x"]][ap["y"]][0]

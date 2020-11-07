@@ -39,7 +39,7 @@ class Agent(object):
         # Take or drop an object at is position 
         if self.underMe != "0" and self.loaded == "":
             # It can take object
-            self.take(self.self[0])
+            self.take(self.underMe)
         elif self.underMe == "0" and self.loaded != "":
             # It can drop object
             self.drop()
@@ -52,7 +52,8 @@ class Agent(object):
                 # self.memory.append(self.neighborhood[lookAt][self.i-1])
                 break
         # sliding window
-        if len(self.memory) == self.memorySize:
+        self.memory.append(self.underMe)
+        if len(self.memory) > self.memorySize:
             self.memory.pop(0)
 
     def move(self, oriantation:CP) -> None:
@@ -82,20 +83,45 @@ class Agent(object):
             self.loaded = ""
 
     def proportionCalculation(self, object:str) -> float:
+        """Calculation of the proportion of objects 
+        Args:
+            object (str): the type of object
+        Returns:
+            float: f
         """
-        Calculation of the proportion of objects 
+        if self.memorySize == 0:
+            return self.proportionCalculationNeighborhood(object)
+        else:
+            return self.propotionCalculationMemory(object)
+
+    def proportionCalculationNeighborhood(self, object:str) -> float:
+        """
+        Calculation of the proportion of objects around the agent
         """
         nbObj = 0.0
+        total = 0.0
         for i in range(4):
-            if self.neighborhood[i][self.i-1] == object:
+            if len(self.neighborhood[i]) != 0 :
+                total += 1.0
+                if self.neighborhood[i][self.i-1] == object:
+                    nbObj += 1.0
+        return nbObj / total
+
+    def propotionCalculationMemory(self, object:str) -> float:
+        """ 
+        Calculation of the proportion of objects in the memory
+        """
+        nbObj = 0.0
+        for m in self.memory:
+            if m == object:
                 nbObj += 1.0
-        return nbObj / 4.0
+        return nbObj / len(self.memory)
 
     def doI(self, probability:float) -> bool:
         """
         Determines if the object is taken/dropped or not.
         """
-        randomValue = random.randfloat(0,100)
-        if randomValue <= probability*100:
+        randomValue = random.uniform(0.0, 1.0)
+        if randomValue <= probability:
             return True
         return False
