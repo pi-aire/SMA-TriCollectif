@@ -2,16 +2,17 @@ import random
 import enum
 
 class CP(enum.Enum):
-    """
-    Cardinal Points
-    """
-    NORTH=0, EAST=1, SOUTH=2, WEST=3
+    """ Cardinal Points """
+    NORTH=0
+    EAST=1
+    SOUTH=2
+    WEST=3
 
 class Environnement(object):
     """
-    docstring
+    Environment class
     """
-    def __init__(self,N,M,na,nb,nAgent):
+    def __init__(self,N,M,na,nb,nAgent) -> None:
         self.grid = [[ "0" for j in range(M)] for i in range(N)]
         self.na  = na
         self.nb  = nb
@@ -20,7 +21,7 @@ class Environnement(object):
         self.M = M
         self.agentsPosition = dict()
 
-    def dropObjects(self):
+    def dropObjects(self) -> None:
         """
         Drops the A , the B
         """
@@ -39,7 +40,7 @@ class Environnement(object):
                 self.grid[x][y] = "B"
                 nbDropped +=1
 
-    def dropAgents(self,ids):
+    def dropAgents(self,ids:list) -> None:
         """
         Places agents in the environment only on the available 0 boxes
         """
@@ -53,7 +54,7 @@ class Environnement(object):
                 naDroped +=1
         # return agentPosition
 
-    def getNeighborhood(self,id:str, range:int):
+    def getNeighborhood(self,id:str, range:int) -> list:
         """
         Return the neighborhood of the agent
         Args:
@@ -63,25 +64,30 @@ class Environnement(object):
         ap = self.agentsPosition[id] #Position de l'agent
         nbh = []
         for oriantation in [(0,-1),(1,0),(0,1),(-1,0)]:
-            boundx = ap.x + (oriantation[0] * range)
-            boundy = ap.y + (oriantation[1] * range)
+            boundx = ap["x"] + (oriantation[0] * range)
+            boundy = ap["y"] + (oriantation[1] * range)
             if (boundx < self.N and boundx >= 0 and 
                 boundy < self.M and boundy >= 0 and
-                self.grid[boundx][boundy] != "R"):
-                if boundx == ap.x:
-                    if boundy < ap.y:
-                        nbh.append(self.grid[ap.x][boundy:ap.y])
+                self.grid[boundx][boundy] != "R"and 
+                len(self.grid[boundx][boundy]) != 2):
+                if boundx == ap["x"]:
+                    if boundy < ap["y"]:
+                        nbh.append(self.grid[ap["x"]][boundy:ap["y"]])
                     else:
-                        nbh.append(self.grid[ap.x][ap.y+oriantation[1]:boundy+oriantation[1]])
+                        nbh.append(self.grid[ap["x"]][ap["y"]+oriantation[1]:boundy+oriantation[1]])
                 else:
-                    if boundx < ap.x:
-                        nbh.append(self.grid[boundx:ap.x][ap.y])
+                    if boundx < ap["x"]:
+                        nbh.append(self.grid[boundx:ap["x"]][ap["y"]])
                     else:
-                        nbh.append(self.grid[ap.x+oriantation[0]:boundx+oriantation[0]][ap.y])    
+                        nbh.append(self.grid[ap["x"]+oriantation[0]:boundx+oriantation[0]][ap["y"]])    
             else:
                 nbh.append([])
+        underAgent = "0"
+        if len(self.grid[ap["x"]][ap["y"]]) == 2:
+            underAgent = self.grid[ap["x"]][ap["y"]][0]
+        return nbh, underAgent
 
-    def newPosition(self, id:str, orentation:CP, range:int):
+    def newPosition(self, id:str, orentation:CP, range:int) -> None:
         """[summary]
 
         Args:
@@ -91,14 +97,31 @@ class Environnement(object):
         """
         orientations = [(0,-1),(1,0),(0,1),(-1,0)]
         ap = self.agentsPosition[id] #Position de l'agent
-        newx = ap.x + (orientations[orentation][0] * range)
-        newy = ap.y + (orientations[orentation][1] * range)
+        newx = ap["x"] + (orientations[orentation][0] * range)
+        newy = ap["y"] + (orientations[orentation][1] * range)
+        # clean the previous position
+        if len(self.grid[ap["x"]][ap["y"]]) == 2:
+            self.grid[ap["x"]][ap["y"]] = self.grid[ap["x"]][ap["y"]][0]
+        else:
+            self.grid[ap["x"]][ap["y"]] = "0"
+            
+        # Set the new position
         self.agentsPosition[id] = {"x":newx, "y":newy}
-        self.grid[newx][newy] = "R" # a voir si l'on supprime un objet qui est à la même place
-
-    def setBlock(self,id:str):
-        
-    def __str__(self):
+        if self.grid[newx][newy] != "0":
+            self.grid[newx][newy] += "R"
+        else:
+            self.grid[newx][newy] = "R"
+            
+    def setBlock(self, id:str, block:str) -> None:
+        ap = self.agentsPosition[id] #Position de l'agent
+        if block == "0":
+            # take block AR or BR
+            self.grid[ap["x"]][ap["y"]] = "R"
+        else:
+            # drop block
+            self.grid[ap["x"]][ap["y"]] = block+"R"
+    
+    def __str__(self) -> str:
         result = ""
         for line in self.grid:
             for value in line:
@@ -108,6 +131,8 @@ class Environnement(object):
                     result += "🅰 "
                 elif value == "B":
                     result += "🅱 "
+                elif len(value) == 2:
+                    result += "🛂"
                 else:
                     result += "🤖"
             result += "\n"

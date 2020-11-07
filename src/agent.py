@@ -1,4 +1,3 @@
-import random
 import math
 from environnement import *
 
@@ -7,7 +6,7 @@ class Agent(object):
     Sorting agent class
     """
 
-    def __init(self, env:Environnement, id, position, kp, km, i, memorySize):
+    def __init__(self, env:Environnement, id:str, kp:float, km:float, i:int, memorySize:int) -> None:
         """
         Position position is a table position[0] = x et [1] = y
         Loaded is a char : 0 empty, A if object A et B if object B
@@ -19,51 +18,50 @@ class Agent(object):
         """
         self.env = env
         self.id = id
-        self.position = position # temporaire
         self.loaded = ""
         self.kp = kp
         self.km = km
         self.i = i
         self.memory = []
-        self.neighborhood
         self.memorySize = memorySize
 
-    def perception(self):
+    def perception(self) -> None:
         """
         Perception of the environment
         """
         # Perceives the surrounding environment
-        self.neighborhood, self.self = self.env.getNeighborhood(self.id, self.i)
+        self.neighborhood, self.underMe = self.env.getNeighborhood(self.id, self.i)
 
-    def action(self):
+    def action(self) -> None:
         """
         Manages the management of actions in the environment
         """
+        # Take or drop an object at is position 
+        if self.underMe != "0" and self.loaded == "":
+            # It can take object
+            self.take(self.self[0])
+        elif self.underMe == "0" and self.loaded != "":
+            # It can drop object
+            self.drop()
+        
         # Filling the memory queue. We look if it isn't a wall
         while True:
             lookAt = random.randint(0,3)
             if len(self.neighborhood[lookAt]) != 0:
-                self.move(CP(lookAt))
-                # it is on the new point
-                
-                if self.neighborhood[lookAt][self.i-1] == "0" and self.loaded != "":
-                    self.drop()
-                elif self.neighborhood[lookAt][self.i-1] != "0" and self.loaded == "":
-                    self.take(self.neighborhood[lookAt][self.i-1])
-                    
+                self.move(CP(lookAt))                   
                 # self.memory.append(self.neighborhood[lookAt][self.i-1])
                 break
         # sliding window
         if len(self.memory) == self.memorySize:
             self.memory.pop(0)
 
-    def move(self, oriantation:CP):
+    def move(self, oriantation:CP) -> None:
         """
         Manages the agent's movements. We must check if the "teleportation" box is not a wall.
         """
         self.env.newPosition(self.id,oriantation,self.i)
 
-    def take(self,object:str):
+    def take(self,object:str) -> None:
         """
         Manages the taking of an object
         """ 
@@ -71,36 +69,33 @@ class Agent(object):
         pTake = math.pow(self.kp / (self.kp + f), 2)
         if self.doI(pTake):
             self.loaded = object
-            
-            #TODO 
-            #Voir comment on prend un objet. As-ton besoin de la lettre ? 
+            self.env.setBlock(self.id,"0")
 
-    def drop(self):
+    def drop(self) -> None:
         """
         Manages the drop of an object
         """
         f = self.proportionCalculation(self.loaded)
         pDrop = math.pow(f / (self.km + f), 2) 
         if self.doI(pDrop):
+            self.env.setBlock(self.id,self.loaded)
             self.loaded = ""
-            # TODO
-            # Prévenir l'environnement qu'on a plus l'objet
 
-    def proportionCalculation(self,object):
+    def proportionCalculation(self, object:str) -> float:
         """
         Calculation of the proportion of objects 
         """
-        nbObj = 0
+        nbObj = 0.0
         for i in range(4):
             if self.neighborhood[i][self.i-1] == object:
-                nbObj += 1
-        return nbObj / 4
+                nbObj += 1.0
+        return nbObj / 4.0
 
-    def doI(self, probability):
+    def doI(self, probability:float) -> bool:
         """
         Determines if the object is taken/dropped or not.
         """
-        random = random.randfloat(0,100)
-        if random <= probability*100:
+        randomValue = random.randfloat(0,100)
+        if randomValue <= probability*100:
             return True
         return False
