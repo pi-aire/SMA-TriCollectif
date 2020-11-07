@@ -6,7 +6,7 @@ class Agent(object):
     Sorting agent class
     """
 
-    def __init__(self, env:Environnement, id:str, kp:float, km:float, i:int, memorySize:int) -> None:
+    def __init__(self, env:Environnement, id:str, kp:float, km:float, i:int, memorySize:int, error:float = .0) -> None:
         """
         Position position is a table position[0] = x et [1] = y
         Loaded is a char : 0 empty, A if object A et B if object B
@@ -24,6 +24,8 @@ class Agent(object):
         self.i = i
         self.memory = []
         self.memorySize = memorySize
+        self.neighborhood:list = []
+        self.error = error
 
     def perception(self) -> None:
         """
@@ -45,12 +47,16 @@ class Agent(object):
             self.drop()
         
         # Filling the memory queue. We look if it isn't a wall
-        while True:
-            lookAt = random.randint(0,3)
-            if len(self.neighborhood[lookAt]) != 0:
-                self.move(CP(lookAt))                   
+        possible = [0,1,2,3]
+        while len(possible) != 0:
+            lookAt = random.randint(0,len(possible)-1)
+            if len(self.neighborhood[possible[lookAt]]) != 0:
+                self.move(CP(possible[lookAt]))                   
                 # self.memory.append(self.neighborhood[lookAt][self.i-1])
                 break
+            else:
+                possible.pop(lookAt)
+        
         # sliding window
         self.memory.append(self.underMe)
         if len(self.memory) > self.memorySize:
@@ -89,10 +95,12 @@ class Agent(object):
         Returns:
             float: f
         """
-        if self.memorySize == 0:
-            return self.proportionCalculationNeighborhood(object)
-        else:
+        if self.memorySize != 0 and self.error != 0.0:
+            return self.proportionCalculationError(object)
+        elif self.memorySize != 0:
             return self.propotionCalculationMemory(object)
+        else:
+            return self.proportionCalculationNeighborhood(object)
 
     def proportionCalculationNeighborhood(self, object:str) -> float:
         """
@@ -117,6 +125,19 @@ class Agent(object):
                 nbObj += 1.0
         return nbObj / len(self.memory)
 
+    def proportionCalculationError(self, object:str) -> float:
+        """ 
+        Calculation of the proportion of objects in the memory with a possible error
+        """
+        nbObj = 0.0
+        nbObjOther = 0.0
+        for m in self.memory:
+            if m == object:
+                nbObj += 1.0
+            elif m != '0':
+                nbObjOther += 1.0
+        return (nbObj+( nbObjOther * self.error)) / len(self.memory)
+        
     def doI(self, probability:float) -> bool:
         """
         Determines if the object is taken/dropped or not.

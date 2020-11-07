@@ -1,5 +1,6 @@
 import random
 import enum
+import numpy as np
 
 class CP(enum.Enum):
     """ Cardinal Points """
@@ -88,12 +89,12 @@ class Environnement(object):
         return nbh, underAgent
 
     def newPosition(self, id:str, orentation:CP, range:int) -> None:
-        """[summary]
-
+        """
+        Set the new position of the agent
         Args:
-            id (str): [description]
-            orentation (CP): [description]
-            range (int): [description]
+            id (str): agent id
+            orentation (CP): agent orienation (cardinal point)
+            range (int): range of a step
         """
         orientations = [(0,-1),(1,0),(0,1),(-1,0)]
         ap = self.agentsPosition[id] #Position de l'agent
@@ -113,6 +114,12 @@ class Environnement(object):
             self.grid[newx][newy] = "R"
             
     def setBlock(self, id:str, block:str) -> None:
+        """
+        Set the block under the agent
+        Args:
+            id (str): agent id
+            block (str): the new value of the block
+        """
         ap = self.agentsPosition[id] #Position de l'agent
         if block == "0":
             # take block AR or BR
@@ -120,6 +127,32 @@ class Environnement(object):
         else:
             # drop block
             self.grid[ap["x"]][ap["y"]] = block+"R"
+    
+    def evaluateEnv(self) -> object:
+        """
+        Calculate the rate of neighbor of the same type per object
+        Returns:
+            object: the Q1 and the mean
+        """
+        tab = np.array([])
+        for x in range(self.N):
+            for y in range(self.M):
+                if self.grid[x][y][0] != 'A' and self.grid[x][y][0] != 'B':
+                    continue
+                counter = 0
+                same = 0
+                for i in range(-1,2):
+                    for j in range(-1,2):
+                        xn = x + i
+                        yn = y + j
+                        if (not(i == 0 and j == 0) 
+                            and xn < self.N and xn >= 0
+                            and yn < self.M and yn >= 0):
+                            counter += 1
+                            if self.grid[x][y][0] == self.grid[xn][yn][0]:
+                                same += 1
+                tab = np.append(tab,float(same) / float(counter)) 
+        return np.quantile(tab,0.25), np.mean(tab)
     
     def __str__(self) -> str:
         result = ""

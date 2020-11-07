@@ -25,12 +25,14 @@ La résolution n'est pas convergent théoriquement
 Une option possibilité  (on essaye de trouver un paramètre de stabilité)
 
 
-## Pour rapport 
-On a levé la contrainte, un agent peut être sur la même case qu'un objet (comme dans l'article, contrairement au sujet)
+## Getting started 
 
-Pour la première partie : 
-- Nous avons implémenté une première fois en regardant le voisinage uniquement. 
-- Nous avons implémenté une seconde fois en regardant la mémoire uniquement. (Ce qui est bcp plus efficace, wtf)
-Quand tu traverses des tas d'objets, tu croises énormément de gens. 
-- Idée : Peut-être faire une approche voisinage + mémoire au bout d'un nombre X d'itération. TODO: Fixé X. (A voir)
+Exercice par exercice 
 
+## Représentation graphique 
+
+🅰 : Représente un objet A
+🅱 : Représente un objet B
+🤖 : Représente un agent
+🛂 : Représente un agent et un objet sur la même case
+⬜ : Représente une case vide
