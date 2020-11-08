@@ -20,7 +20,7 @@ def main():
     env.dropObjects()
     agentIds = ["A"+str(i) for i in range(nbAgent) ]
     env.dropAgents(agentIds)
-    agents = [Agent(env,agentIds[a],0.1,0.3,1,10,0.05) for a in range(nbAgent)]
+    agents = [Agent(env,agentIds[a],0.1,0.3,1,0,0.0) for a in range(nbAgent)]
     display(env)
     
     # Set the observing variables
