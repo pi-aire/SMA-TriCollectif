@@ -35,19 +35,24 @@ Les agents ne s'arrêtent pas de triller même si le tri est satisfaisant. Nous 
 
 Nous avons lancé plusieurs executions afin de vérifier que les courbes de résultats ci-dessous ne sont pas des "accidents" et que les résultats reflètent bien le comportement des agents. 
 
-Au début de la simulation, la grille est sous cette forme :
+a reformuler : les valeurs d'évaluation -> moyen et premier quartile 
+Nous avons réalisé un série d'exécution pour voir comment se comporte nos valeurs d'évaluation en fonction du nombre d'étape et voir si les valeurs d'évaluation permet de bien suivre l'évolution du tri dans l'environnement.
 
-![image de la question 1 - début](./results/q1/gdebut.png)
+Reformuler
+Après analyser des résultats, on a constater que le premier quartile permet de mieux suivre l'évolution de l' environnement que la moyenne. On a donc utilisé cette valeur pour mettre en place notre seuil d'arrêt. 
 
-Après 500 000 itérations, nous obtenons une grille sous cette forme :
+Pour nos test nous avons choisie comme seuil 6/8(valeur qui viens du nombre de voisin qui on le type que l'objet). Et pour la fenêtre glissante on la paramètre de taille 10 et de pourcentage 75%.
 
-![image de la question 1 - fin](./results/q1/gfin.png)
+#### Sans mémoire
+![](./results/q1/gfinSM.png){ width=40% }![](./results/q1/resultSM.png)
 
+Comme on peut le constater on n' atteind pas se seuil donc le tri c'est arrêté aprés 5Milliions d'iterrations.
 
-Comme vous pouvez le constater, il existe 4 clusters bien indépendants. Deux pour les objets A et deux pour les objets B. On remarque 
+#### Avec mémoire
+![](./results/q1/gfinM.png){ width=40% }![](./results/q1/resultM.png)
 
 brouillon : 
-Avec la mémoire, meilleure résultat, mais le pic d'efficacité est plus lent à arriver
+Avec la mémoire, meilleure résultat 
 
 Sans mémoire, moins bon résultat, mais le seuil maximal est inférieur. 
 
@@ -70,10 +75,19 @@ Comme lors de la question 1, nous nous sommes rapidement aperçu visuellement qu
 
 [TODO] Pierre : Justifier l'utilisation de la seconde mesure via le quartile. 
 
+### Les résultats
+#### Taux d'erreur 0.1
+![](./results/q2/gfinE0_1.png){ width=40% }![](./results/q2/resultE(0_1)fs.png)
+
+#### Taux d'erreur 0.5
+![](./results/q2/gfinE0_5.png){ width=40% }![](./results/q2/resultE(0_1)fs.png)
+
+Les deux fin step, ils n'ont pas atteint le seuil
+
 ### Analyse des résultats
 
-A nouveau, nous avons lancé plusieurs execution afin de s'assurer que les captures ci-dessous reflètent le comportement habituel des agents que nous avons implémenté. 
+A nouveau, nous avons lancé plusieurs exécution afin de s'assurer que les captures ci-dessous reflètent le comportement habituel des agents que nous avons implémenté. 
 
-# TODO
-
+[TODO]
 Question 2 : Parler que les clusters sont plus gros, mais comporte un taux d'erreur important
+
