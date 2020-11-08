@@ -21,42 +21,39 @@ Après cette première implémentation, nous avons suivi l'article afin d'implé
 
 #### Outil d'analyse des résultats
 
-Dans un premier temps, nous nous sommes aperçu visuellement que la prise de décision à l'aide de la mémoire était plus efficace que la méthode grâce à l'entourage. Afin de mesurer la différence entre les deux méthodes, nous avons calculé une valeurs qui évalue la concentration des objets de même type.
+Dans un premier temps, nous nous sommes aperçu visuellement que la prise de décision à l'aide de la mémoire était plus efficace que la méthode grâce à l'entourage. Afin de mesurer la différence entre les deux méthodes, nous avons calculé une valeur qui évalue la concentration des objets de même type.
 
-brouillon
-On parcoure tous les objets est l'on compte le nombre de voisin qui est sont de même type que lui, puis on calcul le ratio de de voisin de même type par rapport au nombre de total de voisin. (Voir `evaluateEnv` dans [environnement.py](./src/environnement.py)). Ensuite on calcule la moyenne et le premier quartile de ces taux. C'est deux valeurs permette de bien analyser la concentration des block de même type.
+Pour cela, on parcourt tout les objets et on compte le nombre de voisins qui sont du même type que l'objet courant, ensuite on calcule le ratio de voisins de même type par rapport au nombre de total de voisins. (Voir `evaluateEnv` dans [environnement.py](./src/environnement.py)). Après cela, on calcule la moyenne et le premier quartile du ratio. Ces deux statistiques permettent de bien analyser la concentration des blocks de même type.
 
-Pour des raisons de performance, on réalise la mesure  toute les m étapes valeur que l'on peut changer dans le code [triCollectif.py](./src/triCollectif.py). 
+Pour des raisons de performances, on réalise la mesure toutes les m étapes, valeur que l'on peut changer dans le code [triCollectif.py](./src/triCollectif.py). 
+
 #### Règles d'arrêts
 
-Les agents ne s'arrêtent pas de triller même si le tri est satisfaisant. Nous avons donc mis en place un seuil qui se base le premier quartile fournie par la fonction `evaluationEnv`. On ne souhaite pas que l'on arrête le programme lorsqu'il attaint le seuil, il peut arrivé que le seuil dans des configurations soit atteint alors que les objets ne soit pas tous à fait organiser, c'est pour ça que nous avons mis en place une fenêtre glissante sur les premier quartils de l'environnement pour chaque étape. Pour savoir quand arrêter le tri avec la fenêtre glissante on regarde si le pourcentage de valeurs supérieur au seuil est supérieur au pourcentage p que l'on peut faire varier dans le code [triCollectif.py](./src/triCollectif.py).
+Les agents ne s'arrêtent pas de trier même si le tri est satisfaisant. Nous avons donc mis en place un seuil qui se base sur le premier quartile fournie par la fonction `evaluationEnv`. En revanche, nous ne souhaitons pas que le programme s'arrête dès que le seuil est atteint. Il peut arriver que le seuil soit atteint dans des configurations où tout les objets ne sont pas encore complètement organisés. 
+
+C'est pour cela que nous avons mis en place une fenêtre glissante sur les premier quartile de l'environnement pour chaque étape. Pour savoir quand arrêter le tri avec la fenêtre glissante on regarde si le pourcentage de valeurs supérieures au seuil est supérieur au pourcentage p que l'on peut faire varier dans le code [triCollectif.py](./src/triCollectif.py).
 
 ### Analyse des résultats
 
 Nous avons lancé plusieurs executions afin de vérifier que les courbes de résultats ci-dessous ne sont pas des "accidents" et que les résultats reflètent bien le comportement des agents. 
 
-a reformuler : les valeurs d'évaluation -> moyen et premier quartile 
-Nous avons réalisé un série d'exécution pour voir comment se comporte nos valeurs d'évaluation en fonction du nombre d'étape et voir si les valeurs d'évaluation permet de bien suivre l'évolution du tri dans l'environnement.
+Nous en avons également profiter pour controller et ajuster les valeurs d'évaluations afin d'être certains qu'elle permettent de suivre correctement l'évolution du tri dans l'environnement. 
 
-Reformuler
-Après analyser des résultats, on a constater que le premier quartile permet de mieux suivre l'évolution de l' environnement que la moyenne. On a donc utilisé cette valeur pour mettre en place notre seuil d'arrêt. 
+Après l'analyses des résultats, nous avons constaté que le premier quartile permet de mieux suivre l'évolution de l' environnement que la moyenne. On a donc utilisé cette valeur pour mettre en place notre seuil d'arrêt. 
 
-Pour nos test nous avons choisie comme seuil 6/8(valeur qui viens du nombre de voisin qui on le type que l'objet). Et pour la fenêtre glissante on la paramètre de taille 10 et de pourcentage 75%.
+Pour nos test nous avons choisie comme seuil 6/8. En effet, un objet possède au maximum 8 voisins (N-S-E-O-NE-NO-SE-SO) et nous comptons donc le nombre de voisin qu'il possède. Pour la fenêtre glissante, nous l'avons paramètré avec une taille 10 et de pourcentage 75%.
 
 #### Sans mémoire
 ![](./results/q1/gfinSM.png){ width=40% }![](./results/q1/resultSM.png)
 
-Comme on peut le constater on n' atteind pas se seuil donc le tri c'est arrêté aprés 5Milliions d'iterrations.
+Comme nous pouvons le constater, sur les courbes ci-dessus, le seuil n'est pas atteint, le tri s'est donc arrêté aprés 5 milliions d'iterrations.
 
 #### Avec mémoire
 ![](./results/q1/gfinM.png){ width=40% }![](./results/q1/resultM.png)
 
-brouillon : 
-Avec la mémoire, meilleure résultat 
+En utilisant la mémoire, le nombre de cluster se réduit. Cela engendre de meilleurs résultats. En effet, avec un nombre de cluster réduit, les objets ont plus de voisins.  
 
-Sans mémoire, moins bon résultat, mais le seuil maximal est inférieur. 
-
-Bien s'appuyer sur les graph et les valeurs pour analyser.
+Nous pouvons également constater que la croissance des résultats est plus lente en utilisant la mémoire. Cela veut dire que le tri se fait d'une meilleure façon sur les premières itérations en utilisant le voisinage. Ce résultat semble être lié au fait que l'agent a besoin de se construire une mémoire avant de pouvoir construire sa décision de prise ou de dépôt d'objet. 
 
 ### Question 2 
 
@@ -64,14 +61,15 @@ Bien s'appuyer sur les graph et les valeurs pour analyser.
 
 Dans cette deuxième partie du TP nous avons implémenté un pourcentage d'erreur (modifiable lors de l'appel de la fonction) afin de créer du bruit lors de la perception des objets. 
 
-De plus, notre programme s'arrête quand un seuil de satisfaction est atteint ou, afin de limiter le temps d'exécution, au bout de 500 000 pas de temps, variable modifiable dans src/triCollectif.py/ variable stepDefault. Un pas de temps est un cycle perception/action de l'intégralité des agents. 
+De plus, notre programme s'arrête quand un seuil de satisfaction est atteint ou, afin de limiter le temps d'exécution, au bout de 5 millions pas de temps, variable modifiable dans src/triCollectif.py/ variable stepDefault. Un pas de temps est un cycle perception/action de l'intégralité des agents. 
 
+[TODO] : Remonter la définition du pas de temps
 
 [TODO] : Analyser avec des bruits différents 
 
 ### Outils d'analyse des résultats
 
-Comme lors de la question 1, nous nous sommes rapidement aperçu visuellement que les clusters étaient moins nombreux et donc plus gros. Afin de confirmer notre pensée nous avons utilisé les mêmes mesures que lors de la question précédente. En effet, avec des clusters plus important, notre densité est sensé augmenté car cela fait plus d'objet avec huit voisins. 
+Comme lors de la question 1, nous nous sommes rapidement aperçu visuellement que les clusters étaient moins nombreux et donc plus gros. Afin de confirmer notre pensée nous avons utilisé les mêmes mesures que lors de la question précédente. En effet, avec des clusters plus important, notre densité doit augmenté car cela fait plus d'objets avec huit voisins. 
 
 [TODO] Pierre : Justifier l'utilisation de la seconde mesure via le quartile. 
 
