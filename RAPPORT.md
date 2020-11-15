@@ -20,7 +20,7 @@ Avant que les agents commencent à trier, la grille est ordonnée aléatoirement
 
 #### Implémentation
 
-Dans un premier temps, nous avons suivi le sujet pour la prise et le dépôt d'un objet. Nous avons donc implémenté cette prise en se concentrant sur le voisinage de l'objet (cf. `proportionCalculationNeighborhood` dans [agent.py](./src/agent.py)) en utilisant les formules indiquées dans le sujet.
+Dans un premier temps, nous avons suivi le sujet pour la prise et le dépôt d'un objet. Nous avons donc implémenté cette prise en se concentrant sur le voisinage de l'objet (cf. `proportionCalculationNeighborhood()` dans [agent.py](./src/agent.py)) en utilisant les formules indiquées dans le sujet.
 
 Après cette première implémentation, nous avons suivi l'article afin d'implémenter la prise et le dépôt en fonction de la mémoire.
 
@@ -28,7 +28,7 @@ Après cette première implémentation, nous avons suivi l'article afin d'implé
 
 Dans un premier temps, nous nous sommes aperçu visuellement que la prise de décision à l'aide de la mémoire était plus efficace que la méthode grâce à l'entourage. Afin de mesurer la différence entre les deux méthodes, nous avons calculé une valeur qui évalue la concentration des objets de même type.
 
-Pour cela, on parcourt tout les objets et on compte le nombre de voisins qui sont du même type que l'objet courant, ensuite on calcule le ratio de voisins de même type par rapport au nombre total de voisins. (Voir `evaluateEnv()` dans [environnement.py](./src/environnement.py)). Après cela, on calcule la moyenne et le premier quartile du ratio. Ces deux statistiques permettent de bien analyser la concentration des blocks de même type.
+Pour cela, on parcourt tout les objets et on compte le nombre de voisins qui sont du même type que l'objet courant, ensuite on calcule le ratio de voisins de même type par rapport au nombre total de voisins (voir `evaluateEnv()` dans [environnement.py](./src/environnement.py)). Après cela, on calcule la moyenne et le premier quartile du ratio. Ces deux statistiques permettent de bien analyser la concentration des blocks de même type.
 
 Pour des raisons de performances, on réalise la mesure toutes les m étapes, valeur que l'on peut changer à l'aide de la variable `stepGrap` dans le code de [triCollectif.py](./src/triCollectif.py). 
 
